@@ -1,13 +1,15 @@
 import express, { Request, Response, Application } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 import connectToMongo from './db/db';
-
 import postRouter from './routes/posts';
 
+dotenv.config()
+
 const app: Application = express()
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 connectToMongo();
 
