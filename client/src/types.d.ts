@@ -20,3 +20,27 @@ export interface IdProps {
   currentId?: string,
   setCurrentId: React.Dispatch<React.SetStateAction<string>>
 }
+
+export interface InputFieldProps {
+  half?: boolean,
+  name: string,
+  label: string,
+  type: string,
+  handleChange: () => void,
+  handlePassword?: () => void,
+}
+
+export interface AuthState {
+  authData: {
+    token: string,
+    data: {
+      name: string,
+      picture: string,
+      email: string,
+    }
+  } | null,
+  status: 'idle' | 'success' | 'failed' | 'loading',
+  error: string
+}
+
+export type TokenAndData = AuthState['authData'];

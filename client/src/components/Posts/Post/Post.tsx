@@ -32,7 +32,7 @@ function Post({ post, setCurrentId }: { post: Post, setCurrentId: React.Dispatch
       </div>
 
       <div className={classes.details}>
-        <Typography variant='body2' color='textSecondary'>{post.tags.map(tag => <span>#{tag}&nbsp;</span>)}</Typography>
+        <Typography variant='body2' color='textSecondary'>{post.tags.map((tag, index) => <span key={index}>#{tag}&nbsp;</span>)}</Typography>
       </div>
 
       <Typography className={classes.title} variant='h6' gutterBottom>{post.title}</Typography>
