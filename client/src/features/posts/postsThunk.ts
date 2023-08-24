@@ -1,11 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-
-const url = `http://localhost:3000/posts`;
+import { API } from '..';
 
 export const fetchPosts = createAsyncThunk('posts/getPosts', async () => {
   try {
-    const { data } = await axios.get(url);
+    const { data } = await API.get('/posts');
 
     // 👇 Not Necessary
     return data;
@@ -18,9 +16,8 @@ export const fetchPosts = createAsyncThunk('posts/getPosts', async () => {
 
 export const createPost = createAsyncThunk('posts/createPost', async (initialPost: object) => {
   try {
-    const { data } = await axios.post(url, initialPost);
+    const { data } = await API.post('/posts', initialPost);
 
-    // 👇 Not Necessary
     return data;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -32,7 +29,7 @@ export const createPost = createAsyncThunk('posts/createPost', async (initialPos
 export const updatePost = createAsyncThunk('posts/updatePost', async ({ currentId, postData }: { currentId: string, postData: object }) => {
   try {
 
-    const { data } = await axios.patch(`${url}/${currentId}`, { ...postData });
+    const { data } = await API.patch(`/posts/${currentId}`, postData);
 
     return data;
 
@@ -46,7 +43,7 @@ export const updatePost = createAsyncThunk('posts/updatePost', async ({ currentI
 export const deletePost = createAsyncThunk('posts/deletePost', async (id: string) => {
   try {
 
-    const { data } = await axios.delete(`${url}/${id}`);
+    const { data } = await API.delete(`/posts/${id}`);
 
     return data;
 
@@ -60,9 +57,7 @@ export const deletePost = createAsyncThunk('posts/deletePost', async (id: string
 export const likePost = createAsyncThunk('posts/likePost', async (id: string) => {
   try {
 
-    const { data } = await axios.patch(`${url}/${id}/likePost`);
-
-    console.log(data);
+    const { data } = await API.patch(`posts/${id}/likePost`);
 
     return data;
 

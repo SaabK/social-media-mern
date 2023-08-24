@@ -3,11 +3,11 @@ export interface Post {
   _id?: string,
   title: string,
   message: string,
-  creator: string,
   tags: string[],
+  likes?: string[],
+  creator: string,
   selectedFile: string,
   createdAt?: Date,
-  likeCount?: number
 }
 
 export interface PostsState {
@@ -26,7 +26,7 @@ export interface InputFieldProps {
   name: string,
   label: string,
   type: string,
-  handleChange: () => void,
+  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void,
   handlePassword?: () => void,
 }
 
@@ -37,6 +37,8 @@ export interface AuthState {
       name: string,
       picture: string,
       email: string,
+      _id?: string,
+      sub?: string
     }
   } | null,
   status: 'idle' | 'success' | 'failed' | 'loading',
@@ -44,3 +46,11 @@ export interface AuthState {
 }
 
 export type TokenAndData = AuthState['authData'];
+
+export interface IFormData {
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+}

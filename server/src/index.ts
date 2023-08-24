@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 
 import connectToMongo from './db/db';
 import postRouter from './routes/posts';
+import authRouter from './routes/auth';
 
 dotenv.config()
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 app.use('/posts', postRouter);
+app.use('/auth', authRouter);
 
 app.get('/', (req: Request, res: Response) => res.send('Hello World!'));
 

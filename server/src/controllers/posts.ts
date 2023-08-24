@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import PostMessage from '../models/postMessage';
 import mongoose from 'mongoose';
+import { BigRequest } from '../types';
 
 export const getPosts = async (req: Request, res: Response) => {
   try {
@@ -12,11 +13,11 @@ export const getPosts = async (req: Request, res: Response) => {
   }
 }
 
-export const createPost = async (req: Request, res: Response) => {
+export const createPost = async (req: BigRequest, res: Response) => {
 
   const post = req.body;
 
-  const newPost = new PostMessage(post);
+  const newPost = new PostMessage({ ...post, creator: req.userId, createdAt: new Date().toISOString() });
 
   try {
     await newPost.save();
@@ -58,21 +59,32 @@ export const deletePost = async (req: Request, res: Response) => {
   }
 }
 
-export const likePost = async (req: Request, res: Response) => {
+export const likePost = async (req: BigRequest, res: Response) => {
   const { id: _id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ success: false, data: 'No post with that id' });
 
   try {
 
-    const likedPost = await PostMessage.findOneAndUpdate(
-      { _id },
-      { $inc: { likeCount: 1 } },
-      { new: true }
-    );
+    if (!req.userId) return res.json({ success: false, data: "Not Authenticated" });
+
+    const post = await PostMessage.findById(_id);
+
+    if (!post) return res.json({ success: false, data: "Not such post exists" })
+
+    const index = post.likes.findIndex((id) => id === String(req.userId));
+
+    if (index === -1) {
+      post.likes.push(req.userId);
+    } else {
+      post.likes = post.likes.filter(id => id !== String(req.userId));
+    }
+
+    const likedPost = await PostMessage.findByIdAndUpdate(_id, post, { new: true });
 
     res.json({ success: true, data: likedPost })
   } catch (error: any) {
+    console.log(error);
     res.status(409).json({ success: false, data: error.message })
   }
 }

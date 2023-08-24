@@ -5,9 +5,10 @@ import Input from './Input';
 import { useState } from 'react';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useDispatch } from 'react-redux';
-import { login } from '../../features/auth/authThunk';
+import { login, signin, signup } from '../../features/auth/authThunk';
 import { AppDispatch } from '../../store/store';
 import { useNavigate } from 'react-router-dom'
+import { IFormData } from '../../types';
 
 function Auth() {
 
@@ -15,16 +16,25 @@ function Auth() {
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [hasSignedUp, setHasSignedUp] = useState(false)
+  const [hasSignedUp, setHasSignedUp] = useState(false);
+  const [formData, setFormData] = useState<IFormData>({
+    firstName: '', lastName: '', email: '', password: '', confirmPassword: ''
+  });
 
   const dispatch = useDispatch<AppDispatch>()
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    if (!hasSignedUp) {
+      dispatch(signup({ formData, navigate }));
+    } else {
+      dispatch(signin({ formData, navigate }));
+    }
   }
 
-  const handleChange = () => {
-
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
   const googleSuccess = async (res: CredentialResponse) => {
@@ -59,23 +69,23 @@ function Auth() {
         <Typography variant='h5'>
           {hasSignedUp ? 'Sign In' : 'Sign Up'}
         </Typography>
-        <form className={classes.form} onSubmit={handleSubmit}>
+        <form className={classes.form} onSubmit={(e) => handleSubmit(e)}>
           <Grid container spacing={2}>
             {
               !hasSignedUp && (
                 <>
-                  <Input name='firstName' label="First Name" handleChange={handleChange} type='' half />
+                  <Input name='firstName' label="First Name" handleChange={(e) => handleChange(e)} type='text' half />
 
-                  <Input name='firstName' label="First Name" handleChange={handleChange} type='' half />
+                  <Input name='lastName' label="Last Name" handleChange={(e) => handleChange(e)} type='text' half />
                 </>
               )
             }
-            <Input name='email' label='Email Address' handleChange={handleChange} type='email' />
+            <Input name='email' label='Email Address' handleChange={(e) => handleChange(e)} type='email' />
 
-            <Input name='password' label='Password' handleChange={handleChange} type={showPassword ? 'text' : 'password'} handlePassword={() => setShowPassword(prev => !prev)} />
+            <Input name='password' label='Password' handleChange={(e) => handleChange(e)} type={showPassword ? 'text' : 'password'} handlePassword={() => setShowPassword(prev => !prev)} />
 
             {
-              !hasSignedUp && (<Input name='confirmPassword' label='Repeat Password' type='password' handleChange={handleChange} />)
+              !hasSignedUp && (<Input name='confirmPassword' label='Repeat Password' type='password' handleChange={(e) => handleChange(e)} />)
             }
           </Grid>
 

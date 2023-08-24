@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState, TokenAndData } from '../../types';
-import { login, logout } from './authThunk';
+import { login, logout, signin, signup } from './authThunk';
 
 export const initialState: AuthState = {
   authData: JSON.parse(localStorage.getItem('profile') as string) || null,
@@ -26,6 +26,8 @@ export const authSlice = createSlice({
 
         state.authData = tokenAndData;
 
+        console.log(state.authData);
+
       })
       .addCase(login.rejected, (state, action) => {
         state.status = 'failed';
@@ -44,9 +46,53 @@ export const authSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message as string
       })
+
+      .addCase(signup.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(signup.fulfilled, (state, action) => {
+        state.status = 'success';
+
+        const { data, token } = action.payload;
+
+        state.authData = {
+          token,
+          data
+        }
+
+        localStorage.setItem("profile", JSON.stringify({ token, data }));
+
+      })
+      .addCase(signup.rejected, (state, action) => {
+        console.log('Some Error Occurred In Redux', action.payload, action.type);
+        state.status = 'failed';
+        state.error = action.error.message as string
+      })
+
+      .addCase(signin.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(signin.fulfilled, (state, action) => {
+        state.status = 'success';
+
+        const { data, token } = action.payload;
+
+        state.authData = {
+          token,
+          data
+        }
+
+        localStorage.setItem("profile", JSON.stringify({ token, data }));
+
+      })
+      .addCase(signin.rejected, (state, action) => {
+        console.log('Some Error Occurred In Redux', action.payload, action.type);
+        state.status = 'failed';
+        state.error = action.error.message as string
+      })
   },
 })
 
-// export const {  } = postsSlice.actions
+// export const {  } = authSlice.actions
 
 export default authSlice.reducer

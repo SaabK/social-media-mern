@@ -10,13 +10,13 @@ import { IdProps, Post } from '../../types';
 function Form({ currentId, setCurrentId }: IdProps) {
 
   const dispatch = useDispatch<AppDispatch>();
+  const { auth: { authData: user } } = useSelector((state: RootState) => state);
   // 👇 Finding the post that is being updated if it is being updated
   const post = useSelector((state: RootState) => currentId ? state.posts.posts.find(post => post._id === currentId) : null);
 
   // console.log("Post: ", post);
 
   const [postData, setPostData] = useState<Post>({
-    creator: '',
     title: '',
     message: '',
     tags: [],
@@ -35,9 +35,9 @@ function Form({ currentId, setCurrentId }: IdProps) {
 
     // When we click on update button, then the id gets stored and is not null anymore then we should not update  memory rather than create a new one
     if (currentId) {
-      dispatch(updatePost({ currentId, postData }))
+      dispatch(updatePost({ currentId, postData: { ...postData, name: user?.data.name } }));
     } else {
-      dispatch(createPost(postData))
+      dispatch(createPost({ ...postData, name: user?.data.name }))
     }
 
     clear();
@@ -46,12 +46,21 @@ function Form({ currentId, setCurrentId }: IdProps) {
   const clear = () => {
     setCurrentId('');
     setPostData({
-      creator: '',
       title: '',
       message: '',
       tags: [],
       selectedFile: ''
     });
+  }
+
+  if (!user?.data.name) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant='h6' align='center'>
+          Please Sign In to create your own memories and like others memories
+        </Typography>
+      </Paper>
+    )
   }
 
   return (
@@ -60,14 +69,6 @@ function Form({ currentId, setCurrentId }: IdProps) {
         <Typography variant='h6'>
           {currentId ? 'Editing' : 'Creating'} a Memory
         </Typography>
-        <TextField
-          name='creator'
-          variant='outlined'
-          label="Creator"
-          fullWidth
-          value={postData.creator}
-          onChange={(e) => setPostData({ ...postData, creator: e.target.value })}
-        />
 
         <TextField
           name='title'
